@@ -305,7 +305,10 @@ def opt_min_curv(reftrack: np.ndarray,
     # alpha_mincurv = np.array(sol['x']).reshape((H.shape[1],))
 
     # solve problem (quadprog) -----------------------------------------------------------------------------------------
-    alpha_mincurv = quadprog.solve_qp(H, -f, -G.T, -h, 0)[0]
+    try:
+        alpha_mincurv = quadprog.solve_qp(H, -f, -G.T, -h, 0)[0]
+    except ValueError:
+        raise Incompatibility("InconsistentError")
 
     # print runtime into console window
     if print_debug:
@@ -345,6 +348,9 @@ def opt_min_curv(reftrack: np.ndarray,
 
     return alpha_mincurv, curv_error_max
 
+class Incompatibility(Exception):
+    def __init__(self, message):
+        super().__init__(message)
 
 # testing --------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
